@@ -3,7 +3,9 @@
 
 // #define LOGGER_MODULES_LEVELS_SECTION __attribute__((section("logger_levels")))
 // #define LOGGER_MODULES_NAMES_SECTION __attribute__((section("logger_names")))
-#define LOGGER_MODULES_INFO_SECTION __attribute__((section("logger_modules_info")))
+#define LOGGER_MODULES_INFO_SECTION 			\
+	__attribute__((section("logger_modules_info"))) \
+	__attribute((__used__))
 
 struct _loggerModuleInfo {
 	uint8_t runtime_log_level;
