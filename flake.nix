@@ -1,35 +1,33 @@
 {
-  description = "A Nix-flake-based C/C++ development environment";
+  description = "Development flake for logger library";
 
-  inputs.nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/0.1.*.tar.gz";
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+  };
 
   outputs =
-    { self, nixpkgs }:
-    let
-      supportedSystems = [
+    inputs@{ flake-parts, ... }:
+    flake-parts.lib.mkFlake { inherit inputs; } {
+      systems = [
         "x86_64-linux"
-        "aarch64-linux"
-        "x86_64-darwin"
-        "aarch64-darwin"
       ];
-      forEachSupportedSystem =
-        f: nixpkgs.lib.genAttrs supportedSystems (system: f { pkgs = import nixpkgs { inherit system; }; });
-    in
-    {
-      # Set formating for this flake itself
-      formatter = forEachSupportedSystem ({ pkgs }: pkgs.nixfmt-rfc-style);
-
-      devShells = forEachSupportedSystem (
-        { pkgs }:
+      perSystem =
         {
-          default = pkgs.mkShell {
-            packages = with pkgs; [
-              cmake
-              conan
-              nixfmt-classic
-            ];
-          };
-        }
-      );
+          config,
+          self',
+          inputs',
+          pkgs,
+          system,
+          ...
+        }:
+        {
+          # Set formatter for nix fmt
+          formatter = pkgs.nixfmt-rfc-style;
+
+          packages.logger = pkgs.callPackage ./package.nix { };
+          packages.default = config.packages.logger;
+
+          devShells.default = config.packages.default;
+        };
     };
 }
