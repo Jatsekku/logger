@@ -11,7 +11,7 @@ stdenv.mkDerivation {
 
   outputs = [
     "out"
-    "examples"
+    #"examples"
   ];
 
   src = ./.;
